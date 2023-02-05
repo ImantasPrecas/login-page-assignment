@@ -1,7 +1,7 @@
 import Form from './Form/Form';
 import Header from './LoginHeader';
 
-export default function LoginPageLayout() {
+function LoginPageLayout() {
   return (
     <main className='flex flex-col justify-center items-center mt-40 md:mt-[202px]'>
       <div className='md:w-[433px]'>
@@ -11,3 +11,4 @@ export default function LoginPageLayout() {
     </main>
   );
 }
+export default LoginPageLayout;

@@ -1,15 +1,18 @@
-function LoginHeader() {
+import { useContext } from 'react';
+import { AuthContext } from '../store/auth-context';
+
+type Props = {};
+export default function SuccessLogin({}: Props) {
   return (
     <>
       <div className='flex flex-col justify-center items-center'>
         <h1 className='text-[48px] font-bold leading-[62px] text-white font-PTSans'>
-          Login
+          Congratulations!
         </h1>
         <p className='md:text-[18px] md:font-bold leading-[23px] text-white font-PTSans'>
-          Please enter your Login and your Password
+          User successfully logged in!
         </p>
       </div>
     </>
   );
 }
-export default LoginHeader;
