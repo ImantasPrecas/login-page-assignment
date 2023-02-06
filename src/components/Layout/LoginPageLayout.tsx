@@ -1,4 +1,4 @@
-import Form from './Form/Form';
+import Form from '../LoginForm/LoginForm';
 import Header from './LoginHeader';
 
 function LoginPageLayout() {
