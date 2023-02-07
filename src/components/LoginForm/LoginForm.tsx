@@ -1,7 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import useInput from '../../hooks/use-input';
 import { PersonIconSVG, KeyIconSVG } from '../../assets/GraphicElements/GraphicElements';
 import { AuthContext } from '../../store/auth-context';
+import { fakePostUser } from '../../api/fakeApi';
+import useLocalStorage from '../../hooks/useLocalStorage';
 
 // const EMAIL_REGEX =
 //   /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
@@ -9,6 +11,8 @@ import { AuthContext } from '../../store/auth-context';
 type Props = {};
 function LoginForm({}: Props) {
   const { setIsLoggedIn, setUser } = useContext(AuthContext);
+  const [isLoading, setIsLoading] = useState<boolean | null>();
+  const [userNotFound, setUserNotFound] = useState<boolean | null>();
 
   const {
     value: enteredEmail,
@@ -37,6 +41,8 @@ function LoginForm({}: Props) {
       enteredPassword.trim() !== '' && enteredPassword.trim().length > 3
   );
 
+  const { setItem } = useLocalStorage();
+
   let formData = {
     email: '',
     password: '',
@@ -49,6 +55,19 @@ function LoginForm({}: Props) {
   } else {
     formIsValid = false;
   }
+
+  const postUser = async (formData: any) => {
+    setIsLoading(true);
+    try {
+      const result = await fakePostUser(formData);
+      setIsLoggedIn(true);
+      setItem('userIsLogedIn', enteredEmail);
+      setIsLoading(false);
+    } catch (error) {
+      setUserNotFound(true);
+      setIsLoading(false);
+    }
+  };
 
   const formSubmissionHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,8 +82,7 @@ function LoginForm({}: Props) {
     resetPasswordInput();
 
     setUser(formData);
-
-    setIsLoggedIn(true);
+    postUser(formData);
   };
   return (
     <div className='flex flex-col justify-center items-center mt-12 w-full'>
@@ -107,6 +125,12 @@ function LoginForm({}: Props) {
           {passwordInputHasError && (
             <p className='mt-2 text-lg text-red-400'>Please enter valid password</p>
           )}
+          {userNotFound && (
+            <p className='mt-2 text-lg text-red-400'>
+              User not found, please enter valid email and password.
+            </p>
+          )}
+          {isLoading && <p className='mt-2 text-lg text-white'>Loading...</p>}
         </div>
 
         <div
