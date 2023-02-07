@@ -1,13 +1,19 @@
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { AuthContext } from '../store/auth-context';
 
 type Props = {};
 export default function SuccessLogin({}: Props) {
-  // const { user, setIsLoggedIn } = useContext(AuthContext);
+  const { setIsLoggedIn } = useContext(AuthContext);
+  const [currentUser, setCurrentUser] = useState<string | null>();
+  const { getItem } = useLocalStorage();
 
-  // Fix This
-  // const trimedUsername = user?.email.split('@')[0];
+  useEffect(() => {
+    setCurrentUser(getItem('userIsLogedIn'));
+  }, []);
+
+  const userFromStorage = currentUser?.split('"')[1];
+  const trimedUsername = userFromStorage?.split('@')[0];
 
   const { removeItem } = useLocalStorage();
 
@@ -21,7 +27,7 @@ export default function SuccessLogin({}: Props) {
       <main className='flex flex-col justify-center items-center mt-40 md:mt-[202px]'>
         <div className='flex flex-col justify-center items-center'>
           <h1 className='text-[48px] font-bold leading-[62px] text-white font-PTSans'>
-            {/* Congratulations {trimedUsername} ! */}
+            Congratulations {trimedUsername} !
           </h1>
           <p className='md:text-[18px] md:font-bold leading-[23px] text-white font-PTSans'>
             You successfully logged in!

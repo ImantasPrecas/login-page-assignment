@@ -17,12 +17,11 @@ function App() {
   const { getItem } = useLocalStorage();
 
   useEffect(() => {
-    const userIsLogedIn = getItem('userIsLogedIn');
-    if (!userIsLogedIn) {
-      setIsLoggedIn(false);
+    if (getItem('userIsLogedIn')) {
+      setIsLoggedIn(true);
       return;
     } else {
-      setIsLoggedIn(true);
+      setIsLoggedIn(false);
       return;
     }
   }, []);

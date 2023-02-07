@@ -8,7 +8,7 @@ let user = {
   password: 'cool',
 };
 
-export const fakePostUser = (data: User): Promise<boolean> =>
+export const fakePostUser = (data: User): Promise<User> =>
   new Promise((resolve, reject) => {
     if (data?.email !== user.email) {
       return setTimeout(() => reject(new Error('User not found')), 250);
@@ -17,5 +17,5 @@ export const fakePostUser = (data: User): Promise<boolean> =>
       return setTimeout(() => reject(new Error('Wrong password')), 250);
     }
 
-    setTimeout(() => resolve(true), 1000);
+    setTimeout(() => resolve(data), 1000);
   });

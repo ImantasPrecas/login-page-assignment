@@ -7,7 +7,7 @@ import useLocalStorage from '../../hooks/useLocalStorage';
 
 type Props = {};
 function LoginForm({}: Props) {
-  const { setIsLoggedIn, setUser } = useContext(AuthContext);
+  const { setIsLoggedIn, user, setUser } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState<boolean | null>();
   const [loginError, setLoginError] = useState<boolean | null>();
   const [loginErrorMessage, setLoginErrorMessage] = useState<string | undefined>();
@@ -58,8 +58,11 @@ function LoginForm({}: Props) {
 
     try {
       const result = await fakePostUser(formData);
-      setIsLoggedIn(result);
-      setItem('userIsLogedIn', enteredEmail);
+      if (result) {
+        setIsLoggedIn(true);
+        setUser(result);
+      }
+      setItem('userIsLogedIn', JSON.stringify(result.email));
       setIsLoading(false);
     } catch (error: any) {
       setLoginError(true);
