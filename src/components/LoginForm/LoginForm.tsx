@@ -11,6 +11,7 @@ function LoginForm({}: Props) {
   const [isLoading, setIsLoading] = useState<boolean | null>();
   const [loginError, setLoginError] = useState<boolean | null>();
   const [loginErrorMessage, setLoginErrorMessage] = useState<string | undefined>();
+  const [formIsValid, setFormIsValid] = useState<boolean | undefined>();
 
   const {
     value: enteredEmail,
@@ -37,19 +38,13 @@ function LoginForm({}: Props) {
     password: '',
   };
 
-  let formIsValid = false;
-
   useEffect(() => {
-    if (!emailInputHasError && !passwordInputHasError) {
-      setLoginError(false);
+    if (enteredEmailIsValid && enteredPasswordIsValid && !isLoading) {
+      setFormIsValid(true);
+    } else {
+      setFormIsValid(false);
     }
-  }, [emailInputHasError, passwordInputHasError]);
-
-  if (enteredEmailIsValid && enteredPasswordIsValid) {
-    formIsValid = true;
-  } else {
-    formIsValid = false;
-  }
+  }, [enteredEmailIsValid, enteredPasswordIsValid, isLoading]);
 
   const postUser = async (formData: any) => {
     setIsLoading(true);
