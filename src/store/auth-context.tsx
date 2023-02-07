@@ -1,10 +1,15 @@
 import React from 'react';
 
+interface User {
+  email: string | null;
+  password: string | null;
+}
+
 interface AuthContext {
   isLoggedIn: boolean;
   setIsLoggedIn: (isLoggedIn: boolean) => void;
-  user: { email: string; password: string } | null;
-  setUser: (user: { email: string; password: string } | null) => void;
+  user: User | null;
+  setUser: (user: User | null) => void;
 }
 
 export const AuthContext = React.createContext<AuthContext>({

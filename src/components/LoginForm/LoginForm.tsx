@@ -5,41 +5,30 @@ import { AuthContext } from '../../store/auth-context';
 import { fakePostUser } from '../../api/fakeApi';
 import useLocalStorage from '../../hooks/useLocalStorage';
 
-// const EMAIL_REGEX =
-//   /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g;
-
 type Props = {};
 function LoginForm({}: Props) {
   const { setIsLoggedIn, setUser } = useContext(AuthContext);
   const [isLoading, setIsLoading] = useState<boolean | null>();
-  const [userNotFound, setUserNotFound] = useState<boolean | null>();
+  const [loginError, setLoginError] = useState<boolean | null>();
+  const [loginErrorMessage, setLoginErrorMessage] = useState<string | undefined>();
 
   const {
     value: enteredEmail,
     isValid: enteredEmailIsValid,
     hasError: emailInputHasError,
+    errorMessage: emailErrorMessage,
     valueChangeHandler: emailChangeHandler,
     inputBlurHandler: emailBlurHandler,
-    reset: resetEmailInput,
-  } = useInput(
-    (enteredEmail: string) =>
-      enteredEmail.trim() !== '' &&
-      /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/g.test(
-        enteredEmail
-      )
-  );
+  } = useInput('email');
 
   const {
     value: enteredPassword,
     isValid: enteredPasswordIsValid,
     hasError: passwordInputHasError,
+    errorMessage: passwordErrorMessage,
     valueChangeHandler: passwordChangeHandler,
     inputBlurHandler: passwordBlurHandler,
-    reset: resetPasswordInput,
-  } = useInput(
-    (enteredPassword: string) =>
-      enteredPassword.trim() !== '' && enteredPassword.trim().length > 3
-  );
+  } = useInput('password');
 
   const { setItem } = useLocalStorage();
 
@@ -50,6 +39,12 @@ function LoginForm({}: Props) {
 
   let formIsValid = false;
 
+  useEffect(() => {
+    if (!emailInputHasError && !passwordInputHasError) {
+      setLoginError(false);
+    }
+  }, [emailInputHasError, passwordInputHasError]);
+
   if (enteredEmailIsValid && enteredPasswordIsValid) {
     formIsValid = true;
   } else {
@@ -58,14 +53,18 @@ function LoginForm({}: Props) {
 
   const postUser = async (formData: any) => {
     setIsLoading(true);
+    setLoginError(false);
+    setLoginErrorMessage('');
+
     try {
       const result = await fakePostUser(formData);
-      setIsLoggedIn(true);
+      setIsLoggedIn(result);
       setItem('userIsLogedIn', enteredEmail);
       setIsLoading(false);
-    } catch (error) {
-      setUserNotFound(true);
+    } catch (error: any) {
+      setLoginError(true);
       setIsLoading(false);
+      setLoginErrorMessage(error.message);
     }
   };
 
@@ -77,9 +76,6 @@ function LoginForm({}: Props) {
     }
 
     formData = { ...formData, email: enteredEmail, password: enteredPassword };
-
-    resetEmailInput();
-    resetPasswordInput();
 
     setUser(formData);
     postUser(formData);
@@ -101,16 +97,19 @@ function LoginForm({}: Props) {
             onBlur={emailBlurHandler}
             placeholder='User name or E-mail'
             value={enteredEmail}
-            className='w-full h-full bg-transparent ml-14 text-[18px] font-bold leading-[23px] text-white font-PTSans placeholder:text-white px-2 focus:outline-none'
+            className='w-full h-full bg-transparent pl-14 text-[18px] font-bold leading-[23px] text-white font-PTSans placeholder:text-white px-2 focus:outline-none'
           />
         </div>
         {emailInputHasError && (
-          <p className='mt-2 text-lg text-red-400'>Please enter valid email!</p>
+          <p className='mt-2 text-lg text-red-400'>{emailErrorMessage}</p>
         )}
 
         {/* PASSWORD */}
         <div>
-          <div className='relative border rounded-[10px] mt-5 overflow-hidden h-[50px] w-full hover:bg-slate-100/5'>
+          <div
+            className={`relative border rounded-[10px] mt-5 h-[50px] w-full hover:bg-slate-100/5 
+            ${passwordInputHasError && 'border-red-400'}`}
+          >
             <div className='absolute mx-4 mt-2'>
               <KeyIconSVG />
             </div>
@@ -118,18 +117,15 @@ function LoginForm({}: Props) {
               type='password'
               onChange={passwordChangeHandler}
               onBlur={passwordBlurHandler}
+              value={enteredPassword}
               placeholder='Password'
-              className='w-full h-full bg-transparent ml-14 text-[18px] font-bold leading-[23px] text-white font-PTSans placeholder:text-white px-2 focus:outline-none'
+              className='absolute w-full h-full bg-transparent pl-14 text-[18px] font-bold leading-[23px] text-white font-PTSans placeholder:text-white px-2 focus:outline-none'
             />
           </div>
           {passwordInputHasError && (
-            <p className='mt-2 text-lg text-red-400'>Please enter valid password</p>
+            <p className='mt-2 text-lg text-red-400'>{passwordErrorMessage}</p>
           )}
-          {userNotFound && (
-            <p className='mt-2 text-lg text-red-400'>
-              User not found, please enter valid email and password.
-            </p>
-          )}
+          {loginError && <p className='mt-2 text-lg text-red-400'>{loginErrorMessage}</p>}
           {isLoading && <p className='mt-2 text-lg text-white'>Loading...</p>}
         </div>
 

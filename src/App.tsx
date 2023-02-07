@@ -5,9 +5,14 @@ import SuccessLogin from './components/SuccessLogin';
 import useLocalStorage from './hooks/useLocalStorage';
 import { AuthContext } from './store/auth-context';
 
+interface User {
+  email: string | null;
+  password: string | null;
+}
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<User | null>(null);
 
   const { getItem } = useLocalStorage();
 
